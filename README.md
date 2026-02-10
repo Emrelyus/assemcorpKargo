@@ -1,7 +1,9 @@
 📦 Assemcorp Personel Gelen Kargo Uygulaması
+
 Bu proje, Assemcorp ofisine gelen kargo paketlerinin takibini kolaylaştırmak, kargo kodlarını güvenli bir şekilde depolamak ve personel ile kargo görevlisi arasındaki iletişimi hızlandırmak için geliştirilmiş bulut tabanlı bir web uygulamasıdır.
 
 🚀 Özellikler
+
 Bulut Tabanlı Veri Depolama: Firebase Realtime Database entegrasyonu sayesinde veriler tüm cihazlarda eşzamanlı olarak güncellenir.
 
 Yetkili Giriş Sistemi: Kargo kodları ve düzenleme seçenekleri sadece yönetici şifresi ile giriş yapıldığında görünür.
