@@ -29,6 +29,16 @@
             text-align: center;
             border-bottom: 4px solid var(--primary-red);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .version {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 11px;
+            color: #999;
+            font-weight: 500;
         }
 
         .container {
@@ -115,6 +125,7 @@
 <body>
 
     <header>
+        <div class="version">Ver. 1.0</div>
         <div style="font-weight: bold; font-size: 24px; color: var(--primary-red);">ASSEM<span
                 style="color: var(--dark-grey);">CORP</span></div>
         <div style="font-size: 14px; color: #666;">Bulut Tabanlı Ortak Kargo Kayıt Sistemi</div>
