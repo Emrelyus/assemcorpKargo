@@ -157,6 +157,27 @@
 
         const ADMIN_PASS = "3765";
         let isAdmin = false;
+        let currentData = {};
+
+        // Tabloyu render et
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = "";
+            for (let i = 0; i < 30; i++) {
+                const row = currentData[i] || { tarih: '', isim: '', kargo: '', kod: '' };
+                const tr = document.createElement('tr');
+                const displayKod = isAdmin ? row.kod : (row.kod ? '***' : '');
+                tr.innerHTML = `
+                <td>${i + 1}</td>
+                <td><input type="date" id="t-${i}" value="${row.tarih}" ${isAdmin ? '' : 'disabled'}></td>
+                <td><input type="text" id="i-${i}" value="${row.isim}" ${isAdmin ? '' : 'disabled'} oninput="autoFillDate(${i})"></td>
+                <td><input type="text" id="k-${i}" value="${row.kargo}" ${isAdmin ? '' : 'disabled'} ></td>
+                <td><input type="text" id="c-${i}" value="${displayKod}" data-real-kod="${row.kod}" ${isAdmin ? '' : 'disabled'} style="color:var(--primary-red); font-weight:bold;"></td>
+                <td><button onclick="deleteRow(${i})" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; font-size:12px; ${isAdmin ? '' : 'display:none;'}">🗑️ Sil</button></td>
+                        `;
+                tbody.appendChild(tr);
+            }
+        }
 
         // Tabloyu oluştur ve Verileri Çek
         function init() {
@@ -164,22 +185,8 @@
             tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px;'>Veriler yükleniyor, lütfen bekleyin...</td></tr>";
 
             db.ref('kargolar').on('value', (snapshot) => { // .on kullanarak canlı güncelleme sağladık
-                const data = snapshot.val() || {};
-                tbody.innerHTML = "";
-                for (let i = 0; i < 30; i++) {
-                    const row = data[i] || { tarih: '', isim: '', kargo: '', kod: '' };
-                    const tr = document.createElement('tr');
-                    const displayKod = isAdmin ? row.kod : (row.kod ? '***' : '');
-                    tr.innerHTML = `
-                    <td>${i + 1}</td>
-                    <td><input type="date" id="t-${i}" value="${row.tarih}" ${isAdmin ? '' : 'disabled'}></td>
-                    <td><input type="text" id="i-${i}" value="${row.isim}" ${isAdmin ? '' : 'disabled'} oninput="autoFillDate(${i})"></td>
-                    <td><input type="text" id="k-${i}" value="${row.kargo}" ${isAdmin ? '' : 'disabled'} ></td>
-                    <td><input type="text" id="c-${i}" value="${displayKod}" data-real-kod="${row.kod}" ${isAdmin ? '' : 'disabled'} style="color:var(--primary-red); font-weight:bold;"></td>
-                    <td><button onclick="deleteRow(${i})" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; font-size:12px; ${isAdmin ? '' : 'display:none;'}">🗑️ Sil</button></td>
-                            `;
-                    tbody.appendChild(tr);
-                }
+                currentData = snapshot.val() || {};
+                renderTable();
             });
         }
 
@@ -194,10 +201,8 @@
         function login() {
             if (document.getElementById('pass').value === ADMIN_PASS) {
                 isAdmin = true;
-                document.querySelectorAll('input').forEach(i => {
-                    if (i.id !== "pass") i.disabled = false;
-                });
                 document.getElementById('saveBtn').style.display = "block";
+                renderTable(); // Tabloyu yeniden render et
                 alert("Düzenleme modu aktif.");
             } else { alert("Hatalı Şifre!"); }
         }
@@ -205,12 +210,12 @@
         function saveToCloud() {
             const updates = {};
             for (let i = 0; i < 30; i++) {
-                const kodInput = document.getElementById(`c-${i}`);
+                const kodInput = document.getElementById(`c - ${i} `);
                 const realKod = isAdmin ? kodInput.value : (kodInput.dataset.realKod || '');
                 updates[i] = {
-                    tarih: document.getElementById(`t-${i}`).value,
-                    isim: document.getElementById(`i-${i}`).value,
-                    kargo: document.getElementById(`k-${i}`).value,
+                    tarih: document.getElementById(`t - ${i} `).value,
+                    isim: document.getElementById(`i - ${i} `).value,
+                    kargo: document.getElementById(`k - ${i} `).value,
                     kod: realKod
                 };
             }
@@ -220,11 +225,11 @@
         }
 
         function deleteRow(i) {
-            if (confirm(`${i + 1}. satırı silmek istediğinize emin misiniz?`)) {
-                document.getElementById(`t-${i}`).value = '';
-                document.getElementById(`i-${i}`).value = '';
-                document.getElementById(`k-${i}`).value = '';
-                const kodInput = document.getElementById(`c-${i}`);
+            if (confirm(`${i + 1}. satırı silmek istediğinize emin misiniz ? `)) {
+                document.getElementById(`t - ${i} `).value = '';
+                document.getElementById(`i - ${i} `).value = '';
+                document.getElementById(`k - ${i} `).value = '';
+                const kodInput = document.getElementById(`c - ${i}`);
                 kodInput.value = '';
                 kodInput.dataset.realKod = '';
                 saveToCloud();
