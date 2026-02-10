@@ -125,7 +125,7 @@
 <body>
 
     <header>
-        <div class="version">Ver. 1.0</div>
+        <div class="version">Ver. 1.1</div>
         <div style="font-weight: bold; font-size: 24px; color: var(--primary-red);">ASSEM<span
                 style="color: var(--dark-grey);">CORP</span></div>
         <div style="font-size: 14px; color: #666;">Bulut Tabanlı Ortak Kargo Kayıt Sistemi</div>
@@ -172,12 +172,14 @@
 
         // Tabloyu render et
         function renderTable() {
+            console.log("renderTable çağrıldı, isAdmin:", isAdmin);
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = "";
             for (let i = 0; i < 30; i++) {
                 const row = currentData[i] || { tarih: '', isim: '', kargo: '', kod: '' };
                 const tr = document.createElement('tr');
                 const displayKod = isAdmin ? row.kod : (row.kod ? '***' : '');
+                if (i === 0) console.log("İlk satır - row.kod:", row.kod, "displayKod:", displayKod);
                 tr.innerHTML = `
                 <td>${i + 1}</td>
                 <td><input type="date" id="t-${i}" value="${row.tarih}" ${isAdmin ? '' : 'disabled'}></td>
@@ -203,7 +205,7 @@
 
         // İsim girilince tarihi otomatik bugüne ayarla
         function autoFillDate(i) {
-            const dateInput = document.getElementById(`t - ${i} `);
+            const dateInput = document.getElementById(`t-${i}`);
             if (!dateInput.value) {
                 dateInput.value = new Date().toISOString().split('T')[0];
             }
