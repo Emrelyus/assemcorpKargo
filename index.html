@@ -1,55 +1,169 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <title>Assemcorp Ortak Kargo Paneli</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
+    <link rel="icon" type="image/png" href="logo.png">
     <style>
-        :root { --primary-red: #c1272d; --dark-grey: #231f20; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; display: flex; flex-direction: column; align-items: center; margin: 0; }
-        
-        header { 
-            background: white; width: 100%; padding: 15px; text-align: center; 
-            border-bottom: 4px solid var(--primary-red); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); position: relative; 
+        :root {
+            --primary-red: #c1272d;
+            --dark-grey: #231f20;
         }
 
-        .container { 
-            width: 95%; max-width: 1100px; background: white; margin-top: 20px; 
-            padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); margin-bottom: 40px; 
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
         }
 
-        .login-bar { display: flex; gap: 10px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #ddd; align-items: center; }
+        header {
+            background: white;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 4px solid var(--primary-red);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { background: var(--dark-grey); color: white; padding: 12px; text-align: left; font-size: 14px; }
-        td { border-bottom: 1px solid #eee; padding: 5px; }
+        .container {
+            width: 95%;
+            max-width: 1100px;
+            background: white;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
 
-        input { width: 90%; padding: 8px; border: 1px solid transparent; background: transparent; transition: 0.3s; }
-        input:enabled { border: 1px solid #ccc; background: white; }
-        input:focus { border-color: var(--primary-red); outline: none; }
+        .login-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            align-items: center;
+        }
 
-        .btn-save { background: #28a745; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px; display: none; font-weight: bold; }
-        button { cursor: pointer; padding: 8px 15px; border-radius: 4px; border: 1px solid #ccc; }
-        .btn-primary { background: var(--primary-red); color: white; border: none; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--dark-grey);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        td {
+            border-bottom: 1px solid #eee;
+            padding: 5px;
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            transition: 0.3s;
+        }
+
+        input:enabled {
+            border: 1px solid #ccc;
+            background: white;
+        }
+
+        input:focus {
+            border-color: var(--primary-red);
+            outline: none;
+        }
+
+        .btn-save {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            display: none;
+            font-weight: bold;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .btn-primary {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+        }
 
         /* Pop-up Bildirim Stili */
         #toast {
-            visibility: hidden; min-width: 250px; background-color: #28a745; color: #fff; text-align: center;
-            border-radius: 4px; padding: 16px; position: fixed; z-index: 100; right: 30px; top: 30px; font-size: 17px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #28a745;
+            color: #fff;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 100;
+            right: 30px;
+            top: 30px;
+            font-size: 17px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
-        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
 
-        @keyframes fadein { from {right: 0; opacity: 0;} to {right: 30px; opacity: 1;} }
-        @keyframes fadeout { from {right: 30px; opacity: 1;} to {right: 0; opacity: 0;} }
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein {
+            from {
+                right: 0;
+                opacity: 0;
+            }
+
+            to {
+                right: 30px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeout {
+            from {
+                right: 30px;
+                opacity: 1;
+            }
+
+            to {
+                right: 0;
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 
 <body>
     <header>
-        <div style="font-weight: bold; font-size: 24px; color: var(--primary-red);">ASSEM<span style="color: var(--dark-grey);">CORP</span></div>
+        <div style="font-weight: bold; font-size: 24px; color: var(--primary-red);">ASSEM<span
+                style="color: var(--dark-grey);">CORP</span></div>
         <div style="font-size: 14px; color: #666;">Bulut Tabanlı Ortak Kargo Kayıt Sistemi</div>
     </header>
 
@@ -57,10 +171,12 @@
 
     <div class="container">
         <div class="login-bar">
-            <input type="password" id="pass" placeholder="Yönetici Şifresi" style="width: 150px; border: 1px solid #ccc; background: white;">
+            <input type="password" id="pass" placeholder="Yönetici Şifresi"
+                style="width: 150px; border: 1px solid #ccc; background: white;">
             <button class="btn-primary" onclick="login()">Giriş Yap</button>
             <button onclick="location.reload()">Yenile ↻</button>
-            <button id="saveBtn" class="btn-save" onclick="saveToCloud()" style="margin-left: auto;">💾 Buluta Kaydet</button>
+            <button id="saveBtn" class="btn-save" onclick="saveToCloud()" style="margin-left: auto;">💾 Buluta
+                Kaydet</button>
         </div>
 
         <table>
@@ -95,10 +211,10 @@
             for (let i = 0; i < 30; i++) {
                 const row = currentData[i] || { tarih: '', isim: '', kargo: '', kod: '' };
                 const tr = document.createElement('tr');
-                
+
                 // Şifre girilmediyse kargo kodunu boş göster
                 const displayKod = isAdmin ? (row.kod || '') : '';
-                
+
                 tr.innerHTML = `
                     <td>${i + 1}</td>
                     <td><input type="date" id="t-${i}" value="${row.tarih || ''}" ${isAdmin ? '' : 'disabled'}></td>
@@ -128,7 +244,7 @@
         function showToast() {
             const x = document.getElementById("toast");
             x.className = "show";
-            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+            setTimeout(function () { x.className = x.className.replace("show", ""); }, 3000);
         }
 
         function login() {
@@ -170,4 +286,5 @@
         init();
     </script>
 </body>
+
 </html>
