@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assemcorp Kargo Takip</title>
+    <style>
+        :root {
+            --primary-red: #c1272d;
+            --dark-grey: #231f20;
+            --light-grey: #f4f4f4;
+            --delete-red: #ff4d4d;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--light-grey);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: white;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-bottom: 4px solid var(--primary-red);
+        }
+
+        .container {
+            width: 98%;
+            max-width: 1100px;
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 50px;
+        }
+
+        .login-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            align-items: center;
+        }
+
+        input[type="password"], input[type="text"], input[type="date"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-delete {
+            background-color: transparent;
+            color: var(--delete-red);
+            border: 1px solid var(--delete-red);
+            padding: 5px 8px;
+            font-size: 11px;
+        }
+
+        .btn-delete:hover { background-color: var(--delete-red); color: white; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: var(--dark-grey);
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        input.cell-input {
+            width: 95%;
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 6px;
+            font-size: 14px;
+        }
+
+        input.cell-input:focus {
+            border-color: var(--primary-red);
+            outline: none;
+            background: #fff;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-weight: bold; font-size: 28px; color: var(--primary-red);">ASSEM<span style="color: var(--dark-grey);">CORP</span></div>
+    <div style="font-size: 14px; color: #666;">Personel Gelen Kargo Kayıt Sistemi</div>
+</header>
+
+<div class="container">
+    <div class="login-section">
+        <input type="password" id="passwordInput" placeholder="Yönetici Şifresi">
+        <button onclick="checkLogin()">Giriş Yap</button>
+        <button onclick="logout()" style="background-color: #666;">Çıkış</button>
+        <button id="saveBtn" onclick="saveData()" style="display: none; background-color: #28a745; margin-left: auto;">💾 Değişiklikleri Kaydet</button>
+    </div>
+
+    <div class="status-bar">
+        <div id="statusMsg" style="color: #666; font-weight: bold;">Mod: İzleyici (Sadece Okuma)</div>
+        <div id="dateDisplay" style="color: #888; font-size: 13px;"></div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 30px;">#</th>
+                <th style="width: 120px;">Tarih</th>
+                <th>Personel İsim</th>
+                <th>Kargo Firması</th>
+                <th>Kargo Kodu / No</th>
+                <th id="actionHeader" style="display: none; width: 50px;">Sil</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<script>
+    const ADMIN_PASSWORD = "1234"; 
+    let isAdmin = false;
+
+    // Bugünün tarihini formatlı al (YYYY-MM-DD)
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dateDisplay').innerText = "Bugün: " + new Date().toLocaleDateString('tr-TR');
+
+    function initTable() {
+        const body = document.getElementById('tableBody');
+        body.innerHTML = '';
+        const savedData = JSON.parse(localStorage.getItem('assemcorp_v2')) || [];
+
+        for (let i = 0; i < 30; i++) {
+            const d = savedData[i] || { tarih: '', isim: '', kargo: '', kod: '' };
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${i + 1}</td>
+                <td><input type="date" class="cell-input" data-row="${i}" data-field="tarih" value="${d.tarih}" disabled></td>
+                <td><input type="text" class="cell-input" data-row="${i}" data-field="isim" value="${d.isim}" placeholder="..." disabled oninput="autoFillDate(${i})"></td>
+                <td><input type="text" class="cell-input" data-row="${i}" data-field="kargo" value="${d.kargo}" placeholder="..." disabled></td>
+                <td><input type="text" class="cell-input" data-row="${i}" data-field="kod" value="${d.kod}" placeholder="..." disabled style="font-weight:bold; color:var(--primary-red)"></td>
+                <td class="action-cell" style="display: none;">
+                    <button class="btn-delete" onclick="clearRow(${i})">X</button>
+                </td>
+            `;
+            body.appendChild(tr);
+        }
+    }
+
+    function autoFillDate(index) {
+        const dateInput = document.querySelector(`[data-row="${index}"][data-field="tarih"]`);
+        if (!dateInput.value) {
+            dateInput.value = today;
+        }
+    }
+
+    function checkLogin() {
+        if (document.getElementById('passwordInput').value === ADMIN_PASSWORD) {
+            isAdmin = true;
+            updateUI(true);
+        } else { alert("Hatalı şifre!"); }
+    }
+
+    function logout() {
+        isAdmin = false;
+        updateUI(false);
+        document.getElementById('passwordInput').value = "";
+    }
+
+    function updateUI(logged) {
+        document.querySelectorAll('.cell-input').forEach(el => el.disabled = !logged);
+        document.querySelectorAll('.action-cell').forEach(el => el.style.display = logged ? 'table-cell' : 'none');
+        document.getElementById('actionHeader').style.display = logged ? 'table-cell' : 'none';
+        document.getElementById('saveBtn').style.display = logged ? 'inline-block' : 'none';
+        const msg = document.getElementById('statusMsg');
+        msg.innerText = logged ? "Mod: Düzenleme Yetkisi Aktif" : "Mod: İzleyici (Sadece Okuma)";
+        msg.style.color = logged ? "green" : "#666";
+    }
+
+    function clearRow(i) {
+        if(confirm("Bu satırı temizlemek istiyor musunuz?")) {
+            document.querySelectorAll(`[data-row="${i}"]`).forEach(el => el.value = "");
+        }
+    }
+
+    function saveData() {
+        const data = [];
+        for (let i = 0; i < 30; i++) {
+            data[i] = {
+                tarih: document.querySelector(`[data-row="${i}"][data-field="tarih"]`).value,
+                isim: document.querySelector(`[data-row="${i}"][data-field="isim"]`).value,
+                kargo: document.querySelector(`[data-row="${i}"][data-field="kargo"]`).value,
+                kod: document.querySelector(`[data-row="${i}"][data-field="kod"]`).value
+            };
+        }
+        localStorage.setItem('assemcorp_v2', JSON.stringify(data));
+        alert("Veriler kaydedildi.");
+    }
+
+    initTable();
+</script>
+
+</body>
+</html>
