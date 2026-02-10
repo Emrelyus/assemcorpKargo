@@ -238,11 +238,11 @@
         }
 
         function deleteRow(i) {
-            if (confirm(`${i + 1}. satırı silmek istediğinize emin misiniz ? `)) {
-                document.getElementById(`t - ${i} `).value = '';
-                document.getElementById(`i - ${i} `).value = '';
-                document.getElementById(`k - ${i} `).value = '';
-                const kodInput = document.getElementById(`c - ${i}`);
+            if (confirm(`${i + 1}. satırı silmek istediğinize emin misiniz?`)) {
+                document.getElementById(`t-${i}`).value = '';
+                document.getElementById(`i-${i}`).value = '';
+                document.getElementById(`k-${i}`).value = '';
+                const kodInput = document.getElementById(`c-${i}`);
                 kodInput.value = '';
                 kodInput.dataset.realKod = '';
                 saveToCloud();
