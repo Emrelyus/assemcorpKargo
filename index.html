@@ -1,129 +1,239 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <title>Assemcorp Ortak Kargo Paneli</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    
+
     <style>
-        :root { --primary-red: #c1272d; --dark-grey: #231f20; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; display: flex; flex-direction: column; align-items: center; margin: 0; }
-        header { background: white; width: 100%; padding: 15px; text-align: center; border-bottom: 4px solid var(--primary-red); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .container { width: 95%; max-width: 1100px; background: white; margin-top: 20px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .login-bar { display: flex; gap: 10px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #ddd; align-items: center; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: var(--dark-grey); color: white; padding: 12px; text-align: left; font-size: 14px; }
-        td { border-bottom: 1px solid #eee; padding: 5px; }
-        input { width: 90%; padding: 8px; border: 1px solid transparent; background: transparent; transition: 0.3s; }
-        input:enabled { border: 1px solid #ccc; background: white; }
-        input:focus { border-color: var(--primary-red); outline: none; }
-        .btn-save { background: #28a745; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px; display: none; font-weight: bold; }
-        button { cursor: pointer; padding: 8px 15px; border-radius: 4px; border: 1px solid #ccc; }
-        .btn-primary { background: var(--primary-red); color: white; border: none; }
+        :root {
+            --primary-red: #c1272d;
+            --dark-grey: #231f20;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+
+        header {
+            background: white;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 4px solid var(--primary-red);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1100px;
+            background: white;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .login-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--dark-grey);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        td {
+            border-bottom: 1px solid #eee;
+            padding: 5px;
+        }
+
+        input {
+            width: 90%;
+            padding: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            transition: 0.3s;
+        }
+
+        input:enabled {
+            border: 1px solid #ccc;
+            background: white;
+        }
+
+        input:focus {
+            border-color: var(--primary-red);
+            outline: none;
+        }
+
+        .btn-save {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            display: none;
+            font-weight: bold;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .btn-primary {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+        }
     </style>
 </head>
+
 <body>
 
-<header>
-    <div style="font-weight: bold; font-size: 24px; color: var(--primary-red);">ASSEM<span style="color: var(--dark-grey);">CORP</span></div>
-    <div style="font-size: 14px; color: #666;">Bulut Tabanlı Ortak Kargo Kayıt Sistemi</div>
-</header>
+    <header>
+        <div style="font-weight: bold; font-size: 24px; color: var(--primary-red);">ASSEM<span
+                style="color: var(--dark-grey);">CORP</span></div>
+        <div style="font-size: 14px; color: #666;">Bulut Tabanlı Ortak Kargo Kayıt Sistemi</div>
+    </header>
 
-<div class="container">
-    <div class="login-bar">
-        <input type="password" id="pass" placeholder="Yönetici Şifresi" style="width: 150px; border: 1px solid #ccc; background: white;">
-        <button class="btn-primary" onclick="login()">Giriş Yap</button>
-        <button onclick="location.reload()">Sayfayı Yenile ↻</button>
-        <button id="saveBtn" class="btn-save" onclick="saveToCloud()" style="margin-left: auto;">💾 Buluta Kaydet</button>
+    <div class="container">
+        <div class="login-bar">
+            <input type="password" id="pass" placeholder="Yönetici Şifresi"
+                style="width: 150px; border: 1px solid #ccc; background: white;">
+            <button class="btn-primary" onclick="login()">Giriş Yap</button>
+            <button onclick="location.reload()">Sayfayı Yenile ↻</button>
+            <button id="saveBtn" class="btn-save" onclick="saveToCloud()" style="margin-left: auto;">💾 Buluta
+                Kaydet</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 30px;">#</th>
+                    <th style="width: 130px;">Tarih</th>
+                    <th>Personel İsim</th>
+                    <th>Kargo Firması</th>
+                    <th>Kargo Kodu</th>
+                    <th style="width: 60px;">İşlem</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th style="width: 30px;">#</th>
-                <th style="width: 130px;">Tarih</th>
-                <th>Personel İsim</th>
-                <th>Kargo Firması</th>
-                <th>Kargo Kodu</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-            </tbody>
-    </table>
-</div>
+    <script>
+        // --- FIREBASE AYARLARI ---
+        // URL tırnak içine alındı ve sonundaki boşluk temizlendi
+        const firebaseConfig = {
+            databaseURL: "https://assemcorp-kargo-default-rtdb.europe-west1.firebasedatabase.app"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-<script>
-    // --- FIREBASE AYARLARI ---
-    // URL tırnak içine alındı ve sonundaki boşluk temizlendi
-    const firebaseConfig = {
-        databaseURL: "https://assemcorp-kargo-default-rtdb.europe-west1.firebasedatabase.app" 
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+        const ADMIN_PASS = "3765";
+        let isAdmin = false;
 
-    const ADMIN_PASS = "1234";
-    let isAdmin = false;
+        // Tabloyu oluştur ve Verileri Çek
+        function init() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; padding:20px;'>Veriler yükleniyor, lütfen bekleyin...</td></tr>";
 
-    // Tabloyu oluştur ve Verileri Çek
-    function init() {
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>Veriler yükleniyor, lütfen bekleyin...</td></tr>";
-
-        db.ref('kargolar').on('value', (snapshot) => { // .on kullanarak canlı güncelleme sağladık
-            const data = snapshot.val() || {};
-            tbody.innerHTML = "";
-            for (let i = 0; i < 30; i++) {
-                const row = data[i] || { tarih: '', isim: '', kargo: '', kod: '' };
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${i+1}</td>
+            db.ref('kargolar').on('value', (snapshot) => { // .on kullanarak canlı güncelleme sağladık
+                const data = snapshot.val() || {};
+                tbody.innerHTML = "";
+                for (let i = 0; i < 30; i++) {
+                    const row = data[i] || { tarih: '', isim: '', kargo: '', kod: '' };
+                    const tr = document.createElement('tr');
+                    const displayKod = isAdmin ? row.kod : (row.kod ? '***' : '');
+                    tr.innerHTML = `
+                    <td>${i + 1}</td>
                     <td><input type="date" id="t-${i}" value="${row.tarih}" ${isAdmin ? '' : 'disabled'}></td>
                     <td><input type="text" id="i-${i}" value="${row.isim}" ${isAdmin ? '' : 'disabled'} oninput="autoFillDate(${i})"></td>
                     <td><input type="text" id="k-${i}" value="${row.kargo}" ${isAdmin ? '' : 'disabled'} ></td>
-                    <td><input type="text" id="c-${i}" value="${row.kod}" ${isAdmin ? '' : 'disabled'} style="color:var(--primary-red); font-weight:bold;"></td>
-                `;
-                tbody.appendChild(tr);
-            }
-        });
-    }
-
-    // İsim girilince tarihi otomatik bugüne ayarla
-    function autoFillDate(i) {
-        const dateInput = document.getElementById(`t-${i}`);
-        if (!dateInput.value) {
-            dateInput.value = new Date().toISOString().split('T')[0];
-        }
-    }
-
-    function login() {
-        if(document.getElementById('pass').value === ADMIN_PASS) {
-            isAdmin = true;
-            document.querySelectorAll('input').forEach(i => {
-                if(i.id !== "pass") i.disabled = false;
+                    <td><input type="text" id="c-${i}" value="${displayKod}" data-real-kod="${row.kod}" ${isAdmin ? '' : 'disabled'} style="color:var(--primary-red); font-weight:bold;"></td>
+                    <td><button onclick="deleteRow(${i})" style="background:#dc3545; color:white; border:none; padding:5px 10px; border-radius:3px; font-size:12px; ${isAdmin ? '' : 'display:none;'}">🗑️ Sil</button></td>
+                            `;
+                    tbody.appendChild(tr);
+                }
             });
-            document.getElementById('saveBtn').style.display = "block";
-            alert("Düzenleme modu aktif.");
-        } else { alert("Hatalı Şifre!"); }
-    }
-
-    function saveToCloud() {
-        const updates = {};
-        for (let i = 0; i < 30; i++) {
-            updates[i] = {
-                tarih: document.getElementById(`t-${i}`).value,
-                isim: document.getElementById(`i-${i}`).value,
-                kargo: document.getElementById(`k-${i}`).value,
-                kod: document.getElementById(`c-${i}`).value
-            };
         }
-        db.ref('kargolar').set(updates)
-            .then(() => alert("Başarıyla buluta kaydedildi! Tüm bilgisayarlar güncellendi."))
-            .catch((err) => alert("Hata: " + err));
-    }
 
-    init();
-</script>
+        // İsim girilince tarihi otomatik bugüne ayarla
+        function autoFillDate(i) {
+            const dateInput = document.getElementById(`t - ${i} `);
+            if (!dateInput.value) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
+        }
+
+        function login() {
+            if (document.getElementById('pass').value === ADMIN_PASS) {
+                isAdmin = true;
+                document.querySelectorAll('input').forEach(i => {
+                    if (i.id !== "pass") i.disabled = false;
+                });
+                document.getElementById('saveBtn').style.display = "block";
+                alert("Düzenleme modu aktif.");
+            } else { alert("Hatalı Şifre!"); }
+        }
+
+        function saveToCloud() {
+            const updates = {};
+            for (let i = 0; i < 30; i++) {
+                const kodInput = document.getElementById(`c-${i}`);
+                const realKod = isAdmin ? kodInput.value : (kodInput.dataset.realKod || '');
+                updates[i] = {
+                    tarih: document.getElementById(`t-${i}`).value,
+                    isim: document.getElementById(`i-${i}`).value,
+                    kargo: document.getElementById(`k-${i}`).value,
+                    kod: realKod
+                };
+            }
+            db.ref('kargolar').set(updates)
+                .then(() => alert("Başarıyla buluta kaydedildi! Tüm bilgisayarlar güncellendi."))
+                .catch((err) => alert("Hata: " + err));
+        }
+
+        function deleteRow(i) {
+            if (confirm(`${i + 1}. satırı silmek istediğinize emin misiniz?`)) {
+                document.getElementById(`t-${i}`).value = '';
+                document.getElementById(`i-${i}`).value = '';
+                document.getElementById(`k-${i}`).value = '';
+                const kodInput = document.getElementById(`c-${i}`);
+                kodInput.value = '';
+                kodInput.dataset.realKod = '';
+                saveToCloud();
+            }
+        }
+
+        init();
+    </script>
 
 </body>
+
 </html>
